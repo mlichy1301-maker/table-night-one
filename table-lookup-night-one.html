@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Find Your Table</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #f5f5fa, #e8ecf5);
+      padding: 16px;
+    }
+
+    .card {
+      background: white;
+      max-width: 450px;
+      width: 100%;
+      padding: 28px 24px 24px;
+      border-radius: 18px;
+      box-shadow: 0 18px 35px rgba(15, 23, 42, 0.12);
+    }
+
+    .event-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 4px;
+      letter-spacing: 0.02em;
+    }
+
+    .event-subtitle {
+      font-size: 0.9rem;
+      text-align: center;
+      color: #64748b;
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #475569;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #cbd5f5;
+      font-size: 0.98rem;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    input[type="text"]:focus {
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.18);
+    }
+
+    button {
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: none;
+      background: #4f46e5;
+      color: white;
+      font-weight: 500;
+      font-size: 0.96rem;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      box-shadow: 0 8px 16px rgba(79, 70, 229, 0.25);
+    }
+
+    button:hover {
+      background: #4338ca;
+    }
+
+    .hint {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin-bottom: 18px;
+    }
+
+    .result {
+      margin-top: 8px;
+      padding: 12px 12px;
+      border-radius: 12px;
+      font-size: 0.98rem;
+      display: none;
+    }
+
+    .result.success {
+      background: #ecfdf3;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+
+    .result.error {
+      background: #fef2f2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+
+    .footer-note {
+      margin-top: 14px;
+      font-size: 0.7rem;
+      color: #9ca3af;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="event-title">Find Your Table</div>
+    <div class="event-subtitle">Type your name to see your table number.</div>
+
+    <label for="nameInput">Guest name</label>
+    <div class="input-row">
+      <input
+        id="nameInput"
+        type="text"
+        placeholder="Start typing your first and last name"
+        autocomplete="off"
+      />
+      <button id="searchBtn">Search</button>
+    </div>
+
+    <div class="hint">Tip: Use the same spelling as the RSVP list.</div>
+
+    <div id="result" class="result"></div>
+
+    <div class="footer-note">Having trouble? Please see the check-in desk.</div>
+  </div>
+
+  <script>
+    const guests = [
+      { name: "Alan Berger", table: "242" },
+      { name: "Alan Synkowicz", table: "261" },
+      { name: "Alex Cohen", table: "236" },
+      { name: "Alexis DiGerardo", table: "267" },
+      { name: "Amy Conrad", table: "251" },
+      { name: "Andy Woodward", table: "239" },
+      { name: "Angelica Chadwick", table: "233" },
+      { name: "Ansley Tucker", table: "240" },
+      { name: "Anya Baron", table: "239" },
+      { name: "Austin Coon", table: "244" },
+      { name: "Betsy Mathews", table: "242" },
+      { name: "Brandon Osterlund", table: "246" },
+      { name: "Brian Livingston", table: "257" },
+      { name: "Brian Rains", table: "244" },
+      { name: "Bridget Lacey", table: "263 & 262" },
+      { name: "Brittany Weiner", table: "271" },
+      { name: "Brooke Kline", table: "264" },
+      { name: "Brooke Yencarelli", table: "261" },
+      { name: "Calee Fussell", table: "232" },
+      { name: "Carl Ressa", table: "241" },
+      { name: "Charo Ferrier", table: "271" },
+      { name: "Chris Felicio", table: "234" },
+      { name: "Chris Oldham", table: "257" },
+      { name: "Christian Goulding", table: "240" },
+      { name: "Craig Lewis", table: "239" },
+      { name: "Dan Hafetz", table: "242" },
+      { name: "Dan Long", table: "235" },
+      { name: "Dani Deese", table: "236" },
+      { name: "Dario Furman", table: "249" },
+      { name: "Dee Fairweather", table: "268" },
+      { name: "Don Zinn", table: "257" },
+      { name: "Drew Zachmann", table: "240" },
+      { name: "Elaine Corse", table: "264" },
+      { name: "Elizabeth Deschenes", table: "275" },
+      { name: "Elizabeth Jacobs", table: "243" },
+      { name: "Emily Joyce", table: "275" },
+      { name: "Emmie Gibbs", table: "242" },
+      { name: "Erin Donnelly", table: "245" },
+      { name: "Erin Ridings", table: "263 & 262" },
+      { name: "Evelyn Sliakas", table: "272" },
+      { name: "Gary Pfennig", table: "244" },
+      { name: "Gigi Chery", table: "272" },
+      { name: "Gillian McClellan", table: "249" },
+      { name: "Greg von der Linden", table: "248" },
+      { name: "Heather Roberts", table: "245" },
+      { name: "Issy Nguyen", table: "243" },
+      { name: "Jack Hackett", table: "239" },
+      { name: "Jaime Milner", table: "237" },
+      { name: "Jamie Cullen", table: "241" },
+      { name: "Jamie Javorsky", table: "242" },
+      { name: "Jennifer Bowers", table: "243" },
+      { name: "Jennifer Cobaugh", table: "241" },
+      { name: "Jenny Eaton", table: "249" },
+      { name: "Jessica Andia", table: "268" },
+      { name: "Jessica Feerick", table: "236" },
+      { name: "Jill Pantano", table: "238" },
+      { name: "Joe Mella", table: "275" },
+      { name: "Jon Bolton", table: "241" },
+      { name: "Juan Moreno", table: "238" },
+      { name: "Karen Melby", table: "250" },
+      { name: "Kari Benson", table: "264" },
+      { name: "Katerina Moreno", table: "267" },
+      { name: "Kay Shah", table: "264" },
+      { name: "Kerin Mickenberg", table: "247" },
+      { name: "Kirk Bukowski", table: "251" },
+      { name: "Kyle Rasmussen", table: "238" },
+      { name: "Lauren Casta", table: "250" },
+      { name: "Leigh Cassett", table: "248" },
+      { name: "Liam Garrity", table: "244" },
+      { name: "Madison Bulgajewski", table: "237" },
+      { name: "Marissa Lichy", table: "245" },
+      { name: "Mark Berger", table: "232" },
+      { name: "Matt Beck", table: "240" },
+      { name: "Matt Johnson", table: "232" },
+      { name: "Matt Shore", table: "244" },
+      { name: "Matthew Richards", table: "241" },
+      { name: "Meagan Penland", table: "243" },
+      { name: "Michael Arnold", table: "243" },
+      { name: "Michael Beaton", table: "234" },
+      { name: "Michael Cappiello", table: "242" },
+      { name: "Michael McGahey", table: "248" },
+      { name: "Navinder Binning", table: "251" },
+      { name: "Ned Hansen", table: "240" },
+      { name: "Nick Jochim", table: "275" },
+      { name: "Pam Magee", table: "266 & 265" },
+      { name: "Raidelyn Penate", table: "272" },
+      { name: "Regan Roisman", table: "271" },
+      { name: "Richie Vafiadou", table: "235" },
+      { name: "RJ DiGerolamo", table: "240" },
+      { name: "Robert Reckner", table: "240" },
+      { name: "Sabrina Pahlm", table: "267" },
+      { name: "Sam Mickenberg", table: "237" },
+      { name: "Sam Ross", table: "240" },
+      { name: "Sarah Vazquez", table: "234" },
+      { name: "Shane Havens", table: "239" },
+      { name: "Shari Gottlieb", table: "268" },
+      { name: "Shawn Santos", table: "244" },
+      { name: "Stacy Kelly", table: "247" },
+      { name: "Stephanie Anderson", table: "266 & 265" },
+      { name: "Steve Zarch", table: "250" },
+      { name: "Sydney Cain", table: "236" },
+      { name: "Sylvia McNeil", table: "267" },
+      { name: "Tammy Davis", table: "247" },
+      { name: "Tara James", table: "246" },
+      { name: "Thomas Sullivan", table: "243" },
+      { name: "Tyler Klein", table: "241" },
+      { name: "Vivian Rigal", table: "261" },
+      { name: "Willie Guzman", table: "233" }
+    ];
+
+    function normalize(str) {
+      return str.trim().toLowerCase();
+    }
+
+    function findGuest(name) {
+      const query = normalize(name);
+      if (!query) return null;
+
+      let matches = guests.filter(g => normalize(g.name) === query);
+
+      if (matches.length === 0) {
+        matches = guests.filter(g => normalize(g.name).includes(query));
+      }
+
+      if (matches.length === 0) return { type: "none" };
+      if (matches.length === 1) return { type: "single", guest: matches[0] };
+      return { type: "multiple", guests: matches };
+    }
+
+    const resultBox = document.getElementById("result");
+    const nameInput = document.getElementById("nameInput");
+
+    function showResult(result, inputName) {
+      if (!result) {
+        resultBox.style.display = "none";
+        return;
+      }
+
+      resultBox.style.display = "block";
+
+      if (result.type === "none") {
+        resultBox.className = "result error";
+        resultBox.innerHTML =
+          `No match found for "<strong>${inputName}</strong>". Please check the spelling.`;
+      } else if (result.type === "single") {
+        resultBox.className = "result success";
+        resultBox.innerHTML =
+          `<strong>${result.guest.name}</strong> is seated at <strong>Table ${result.guest.table}</strong>.`;
+      } else {
+        resultBox.className = "result success";
+        const list = result.guests
+          .map(g => `<li><strong>${g.name}</strong> — Table ${g.table}</li>`)
+          .join("");
+        resultBox.innerHTML =
+          `Multiple matches found:<br><ul>${list}</ul>`;
+      }
+    }
+
+    function doSearch() {
+      const input = nameInput.value;
+      const result = findGuest(input);
+      showResult(result, input);
+    }
+
+    document.getElementById("searchBtn").addEventListener("click", doSearch);
+    nameInput.addEventListener("keyup", e => {
+      if (e.key === "Enter") doSearch();
+    });
+  </script>
+</body>
+</html>
